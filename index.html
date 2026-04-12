@@ -454,4 +454,30 @@ async function processPDF(b64,filename,type){
     } else {
       openExpenseForm(null,'business',{
         description:parsed.description||'',
-        date:parsed.date||
+        date:parsed.date||today(),
+        amount:parsed.amount||0,
+        btwAmount:parsed.btwAmount||0,
+        btwRate:String(parsed.btwRate||21),
+        category:parsed.category||EXP_CATS_BUSINESS[0],
+        note:filename
+      });
+    }
+  } catch(err){
+    hideLoading();
+    console.error('PDF error:',err);
+    alert('PDF okunamadi.\n'+err.message+'\n\nBilgileri elle girebilirsin.');
+    if(isInv)openInvoiceForm(null);else openExpenseForm(null,'business');
+  }
+}
+
+function viewDoc(id){
+  var docs=DB.get('documents');var d=docs.filter(function(x){return x.id===id;})[0];if(!d)return;
+  try{var b=atob(d.b64);var arr=new Uint8Array(b.length);for(var i=0;i<b.length;i++)arr[i]=b.charCodeAt(i);var blob=new Blob([arr],{type:'application/pdf'});var url=URL.createObjectURL(blob);window.open(url,'_blank');}
+  catch(e){alert('PDF acilamadi.');}
+}
+
+checkAutoBetaald();
+showTab('dashboard');
+</script>
+</body>
+</html>
