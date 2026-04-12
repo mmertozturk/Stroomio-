@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Stroomio"/>
+<meta name="theme-color" content="#0d1b2a"/>
+<title>Stroomio</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy2: #122035;
+    --navy3: #1a2d42;
+    --blue: #1a6fbf;
+    --blue2: #2589e0;
+    --accent: #4fc3f7;
+    --success: #22c55e;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --text: #e2eaf4;
+    --muted: #7a9bbf;
+    --border: #1e3352;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-top: env(safe-area-inset-top, 0px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--navy); font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text); overflow: hidden; }
+  #app { display: flex; flex-direction: column; height: 100%; padding-top: var(--safe-top); }
+  #header { background: var(--navy3); border-bottom: 1px solid var(--border); padding: 14px 18px 12px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  #header-logo { width: 32px; height: 32px; background: var(--blue); border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  #header-title { font-size: 17px; font-weight: 800; color: var(--text); }
+  #header-sub { font-size: 11px; color: var(--muted); }
+  #content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px; }
+  #bottom-nav { background: var(--navy3); border-top: 1px solid var(--border); display: flex; padding-bottom: var(--safe-bottom); flex-shrink: 0; }
+  .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; border: none; background: none; color: var(--muted); font-size: 10px; font-family: inherit; font-weight: 600; cursor: pointer; transition: color 0.15s; }
+  .nav-btn.active { color: var(--blue2); }
+  .nav-btn svg { width: 22px; height: 22px; }
+  .card { background: var(--navy2); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .stat { background: var(--navy2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .stat-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .stat-val { font-size: 18px; font-weight: 800; }
+  .row { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .row:last-child { border-bottom: none; }
+  .row-main { flex: 1; min-width: 0; }
+  .row-name { font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .row-amt { font-size: 14px; font-weight: 800; }
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+  .badge-green { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e44; }
+  .badge-warn { background: #f59e0b22; color: #f59e0b; border: 1px solid #f59e0b44; }
+  .badge-red { background: #ef444422; color: #ef4444; border: 1px solid #ef444444; }
+  .badge-blue { background: #2589e022; color: #2589e0; border: 1px solid #2589e044; }
+  .prog-wrap { background: var(--border); border-radius: 99px; height: 7px; overflow: hidden; }
+  .prog-bar { height: 100%; border-radius: 99px; transition: width .4s ease; }
+  .fab { position: fixed; right: 18px; bottom: calc(70px + var(--safe-bottom)); width: 52px; height: 52px; background: var(--blue); border-radius: 16px; border: none; color: #fff; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px #1a6fbf55; z-index: 10; }
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 100; display: flex; align-items: flex-end; }
+  .sheet { background: var(--navy3); border-radius: 20px 20px 0 0; width: 100%; max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px 18px calc(20px + var(--safe-bottom)); }
+  .sheet-handle { width: 40px; height: 4px; background: var(--border); border-radius: 99px; margin: 0 auto 18px; }
+  .sheet-title { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 20px; }
+  label.fl { display: block; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; margin-top: 14px; }
+  input, select, textarea { width: 100%; background: var(--navy); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; color: var(--text); font-size: 15px; font-family: inherit; outline: none; appearance: none; -webkit-appearance: none; }
+  input:focus, select:focus, textarea:focus { border-color: var(--blue2); }
+  textarea { resize: vertical; min-height: 70px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn-primary { width: 100%; background: var(--blue); color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 800; font-family: inherit; cursor: pointer; margin-top: 18px; }
+  .btn-row { display: flex; gap: 8px; margin-top: 6px; }
+  .btn-sm { padding: 7px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .btn-pay { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e44; }
+  .btn-edit { background: #2589e022; color: #2589e0; border: 1px solid #2589e044; }
+  .btn-del { background: #ef444422; color: #ef4444; border: 1px solid #ef444444; }
+  input[type=range] { padding: 0; height: 6px; accent-color: var(--blue2); background: transparent; }
+  .page-title { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .page-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .empty { text-align: center; color: var(--muted); font-size: 13px; padding: 28px 0; }
+  @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .page { animation: slideUp .2s ease; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div id="header-logo">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+    <div>
+      <div id="header-title">Stroomio</div>
+      <div id="header-sub">ZZP Yönetim</div>
+    </div>
+  </div>
+  <div id="content"></div>
+  <nav id="bottom-nav">
+    <button class="nav-btn active" data-tab="dashboard" onclick="showTab('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-btn" data-tab="invoices" onclick="showTab('invoices')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+      Faturalar
+    </button>
+    <button class="nav-btn" data-tab="expenses" onclick="showTab('expenses')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Gelir/Gider
+    </button>
+    <button class="nav-btn" data-tab="projects" onclick="showTab('projects')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Projeler
+    </button>
+  </nav>
+</div>
+<script>
+const DB={get:k=>JSON.parse(localStorage.getItem('stroomio_'+k)||'[]'),set:(k,v)=>localStorage.setItem('stroomio_'+k,JSON.stringify(v))};
+const fmtEUR=n=>new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(+n||0);
+const fmtDate=d=>d?new Date(d).toLocaleDateString('nl-NL',{day:'2-digit',month:'2-digit',year:'numeric'}):'-';
+const today=()=>new Date().toISOString().split('T')[0];
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+function badge(s){const m={'Betaald':'badge-green','Beklemede':'badge-warn','Gecikmiş':'badge-red','İptal':'badge-red','Devam Ediyor':'badge-blue','Tamamlandı':'badge-green','Bekliyor':'badge-warn'};return`<span class="badge ${m[s]||'badge-blue'}">${s}</span>`;}
+function prog(p,c='var(--blue2)'){return`<div class="prog-wrap"><div class="prog-bar" style="width:${Math.min(p,100)}%;background:${p>=100?'var(--success)':c}"></div></div>`;}
+let currentTab='dashboard';
+function showTab(tab){currentTab=tab;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));const el=document.getElementById('content');el.scrollTop=0;el.innerHTML='';document.querySelector('.fab')?.remove();if(tab==='dashboard')renderDashboard();else if(tab==='invoices')renderInvoices();else if(tab==='expenses')renderExpenses();else if(tab==='projects')renderProjects();}
+function openSheet(html,onReady){const ov=document.createElement('div');ov.className='overlay';ov.innerHTML=`<div class="sheet"><div class="sheet-handle"></div>${html}</div>`;ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});document.body.appendChild(ov);if(onReady)onReady(ov);}
+function closeSheet(){document.querySelector('.overlay')?.remove();}
+function addFab(fn){const f=document.createElement('button');f.className='fab';f.innerHTML='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';f.onclick=fn;document.body.appendChild(f);}
+
+function renderDashboard(){const inv=DB.get('invoices'),exp=DB.get('expenses'),pro=DB.get('projects');const paid=inv.filter(i=>i.status==='Betaald').reduce((s,i)=>s+(+i.amount),0),pend=inv.filter(i=>i.status==='Beklemede').reduce((s,i)=>s+(+i.amount),0),totalExp=exp.reduce((s,e)=>s+(+e.amount),0),net=paid-totalExp,activeP=pro.filter(p=>p.progress<100).length;const recent=[...inv].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);const recentRows=recent.map(i=>`<div class="row"><div class="row-main"><div class="row-name">${i.client}</div><div class="row-sub">${i.invoiceNo} · ${fmtDate(i.date)}</div></div><div style="text-align:right"><div class="row-amt" style="color:var(--text)">${fmtEUR(i.amount)}</div>${badge(i.status)}</div></div>`).join('')||'<div class="empty">Henüz fatura yok</div>';const proRows=pro.slice(0,4).map(p=>`<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:700;color:var(--text)">${p.name}</span><span style="font-size:13px;font-weight:800;color:${p.progress>=100?'var(--success)':'var(--accent)'}">${p.progress}%</span></div>${prog(p.progress)}</div>`).join('')||'<div class="empty">Henüz proje yok</div>';document.getElementById('content').innerHTML=`<div class="page"><div class="page-title">Dashboard</div><div class="page-sub">Stroomio — Genel Bakış</div><div class="stat-grid"><div class="stat"><div class="stat-label">Toplam Gelir</div><div class="stat-val" style="color:var(--success)">${fmtEUR(paid)}</div></div><div class="stat"><div class="stat-label">Bekleyen</div><div class="stat-val" style="color:var(--warn)">${fmtEUR(pend)}</div></div><div class="stat"><div class="stat-label">Giderler</div><div class="stat-val" style="color:var(--danger)">${fmtEUR(totalExp)}</div></div><div class="stat"><div class="stat-label">Net Kâr</div><div class="stat-val" style="color:${net>=0?'var(--success)':'var(--danger)'}">${fmtEUR(net)}</div></div></div><div class="stat" style="margin-bottom:12px"><div class="stat-label">Aktif Proje</div><div class="stat-val" style="color:var(--accent)">${activeP}</div></div><div class="card"><div class="card-title">Son Faturalar</div>${recentRows}</div><div class="card"><div class="card-title">Proje Durumu</div>${proRows}</div></div>`;}
+
+const INV_STATUSES=['Beklemede','Betaald','Gecikmiş','İptal'];
+function renderInvoices(){const inv=DB.get('invoices');const total=inv.reduce((s,i)=>s+(+i.amount),0),paid=inv.filter(i=>i.status==='Betaald').reduce((s,i)=>s+(+i.amount),0);const rows=inv.map(i=>`<div class="row"><div class="row-main"><div class="row-name">${i.client}</div><div class="row-sub">${i.invoiceNo} · ${fmtDate(i.date)}${i.dueDate?' · Son: '+fmtDate(i.dueDate):''}</div>${i.description?`<div class="row-sub">${i.description}</div>`:''}</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0"><div class="row-amt" style="color:var(--text)">${fmtEUR(i.amount)}</div>${badge(i.status)}<div class="btn-row" style="margin-top:0">${i.status!=='Betaald'?`<button class="btn-sm btn-pay" onclick="markPaid('${i.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></button>`:''}<button class="btn-sm btn-edit" onclick="editInvoice('${i.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg></button><button class="btn-sm btn-del" onclick="delInvoice('${i.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg></button></div></div></div>`).join('')||'<div class="empty">Henüz fatura eklenmedi</div>';document.getElementById('content').innerHTML=`<div class="page"><div class="page-title">Faturalar</div><div class="page-sub">${inv.length} fatura · ${fmtEUR(paid)} tahsil edildi</div><div class="stat-grid" style="margin-bottom:12px"><div class="stat"><div class="stat-label">Toplam</div><div class="stat-val" style="color:var(--text);font-size:15px">${fmtEUR(total)}</div></div><div class="stat"><div class="stat-label">Tahsil</div><div class="stat-val" style="color:var(--success);font-size:15px">${fmtEUR(paid)}</div></div></div><div class="card">${rows}</div><div style="height:70px"></div></div>`;addFab(()=>openInvoiceForm());}
+function openInvoiceForm(inv){const isEdit=!!inv;const d=inv||{client:'',invoiceNo:'STR-'+Date.now().toString().slice(-4),date:today(),dueDate:'',amount:'',status:'Beklemede',description:''};openSheet(`<div class="sheet-title">${isEdit?'Faturayı Düzenle':'Yeni Fatura'}</div><label class="fl">Müşteri Adı</label><input id="f-client" value="${d.client}" placeholder="Acme B.V."/><label class="fl">Fatura No</label><input id="f-no" value="${d.invoiceNo}"/><div class="grid2"><div><label class="fl">Tarih</label><input type="date" id="f-date" value="${d.date}"/></div><div><label class="fl">Son Ödeme</label><input type="date" id="f-due" value="${d.dueDate||''}"/></div></div><label class="fl">Tutar (€)</label><input type="number" id="f-amt" value="${d.amount}" placeholder="0.00" inputmode="decimal"/><label class="fl">Durum</label><select id="f-status">${INV_STATUSES.map(s=>`<option ${s===d.status?'selected':''}>${s}</option>`).join('')}</select><label class="fl">Açıklama</label><input id="f-desc" value="${d.description||''}" placeholder="Netwerk installatie..."/><button class="btn-primary" onclick="saveInvoice('${isEdit?d.id:''}')">${isEdit?'Güncelle':'Kaydet'}</button>`);}
+function saveInvoice(id){const inv=DB.get('invoices');const item={id:id||uid(),client:document.getElementById('f-client').value,invoiceNo:document.getElementById('f-no').value,date:document.getElementById('f-date').value,dueDate:document.getElementById('f-due').value,amount:document.getElementById('f-amt').value,status:document.getElementById('f-status').value,description:document.getElementById('f-desc').value};if(!item.client||!item.amount)return;const updated=id?inv.map(i=>i.id===id?item:i):[item,...inv];DB.set('invoices',updated);closeSheet();renderInvoices();}
+function markPaid(id){DB.set('invoices',DB.get('invoices').map(i=>i.id===id?{...i,status:'Betaald'}:i));renderInvoices();}
+function editInvoice(id){const inv=DB.get('invoices').find(i=>i.id===id);if(inv)openInvoiceForm(inv);}
+function delInvoice(id){if(!confirm('Bu faturayı silmek istiyor musun?'))return;DB.set('invoices',DB.get('invoices').filter(i=>i.id!==id));renderInvoices();}
+
+const EXP_CATS=['Araç & Yakıt','Alet & Ekipman','Yazılım & Abonelik','Sigorta','BTW','Diğer'];
+function renderExpenses(){const exp=DB.get('expenses');const total=exp.reduce((s,e)=>s+(+e.amount),0);const catTotals=EXP_CATS.map(c=>({c,t:exp.filter(e=>e.category===c).reduce((s,e)=>s+(+e.amount),0)})).filter(x=>x.t>0);const catHtml=catTotals.length?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">${catTotals.map(x=>`<div class="stat" style="padding:10px 12px"><div class="stat-label">${x.c}</div><div style="font-size:14px;font-weight:800;color:var(--danger)">${fmtEUR(x.t)}</div></div>`).join('')}</div>`:'';const rows=exp.map(e=>`<div class="row"><div class="row-main"><div class="row-name">${e.description}</div><div class="row-sub">${e.category} · ${fmtDate(e.date)}</div>${e.note?`<div class="row-sub">${e.note}</div>`:''}</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0"><div class="row-amt" style="color:var(--danger)">-${fmtEUR(e.amount)}</div><div class="btn-row" style="margin-top:0"><button class="btn-sm btn-edit" onclick="editExpense('${e.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg></button><button class="btn-sm btn-del" onclick="delExpense('${e.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg></button></div></div></div>`).join('')||'<div class="empty">Henüz gider eklenmedi</div>';document.getElementById('content').innerHTML=`<div class="page"><div class="page-title">Gelir / Gider</div><div class="page-sub">Toplam gider: ${fmtEUR(total)}</div>${catHtml}<div class="card">${rows}</div><div style="height:70px"></div></div>`;addFab(()=>openExpenseForm());}
+function openExpenseForm(exp){const isEdit=!!exp;const d=exp||{description:'',amount:'',category:EXP_CATS[0],date:today(),note:''};openSheet(`<div class="sheet-title">${isEdit?'Gideri Düzenle':'Gider Ekle'}</div><label class="fl">Açıklama</label><input id="e-desc" value="${d.description}" placeholder="Fluke kablo test cihazı"/><label class="fl">Kategori</label><select id="e-cat">${EXP_CATS.map(c=>`<option ${c===d.category?'selected':''}>${c}</option>`).join('')}</select><div class="grid2"><div><label class="fl">Tutar (€)</label><input type="number" id="e-amt" value="${d.amount}" placeholder="0.00" inputmode="decimal"/></div><div><label class="fl">Tarih</label><input type="date" id="e-date" value="${d.date}"/></div></div><label class="fl">Not</label><input id="e-note" value="${d.note||''}" placeholder="Opsiyonel..."/><button class="btn-primary" onclick="saveExpense('${isEdit?d.id:''}')">${isEdit?'Güncelle':'Kaydet'}</button>`);}
+function saveExpense(id){const exp=DB.get('expenses');const item={id:id||uid(),description:document.getElementById('e-desc').value,category:document.getElementById('e-cat').value,amount:document.getElementById('e-amt').value,date:document.getElementById('e-date').value,note:document.getElementById('e-note').value};if(!item.description||!item.amount)return;const updated=id?exp.map(e=>e.id===id?item:e):[item,...exp];DB.set('expenses',updated);closeSheet();renderExpenses();}
+function editExpense(id){const exp=DB.get('expenses').find(e=>e.id===id);if(exp)openExpenseForm(exp);}
+function delExpense(id){if(!confirm('Bu gideri silmek istiyor musun?'))return;DB.set('expenses',DB.get('expenses').filter(e=>e.id!==id));renderExpenses();}
+
+const PROJ_STATUSES=['Devam Ediyor','Tamamlandı','Bekliyor','İptal'];
+function renderProjects(){const pro=DB.get('projects');const active=pro.filter(p=>p.progress<100).length,done=pro.filter(p=>p.progress>=100).length;const cards=pro.map(p=>`<div class="card" style="cursor:pointer" onclick="openProjectDetail('${p.id}')"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div><div style="font-size:15px;font-weight:800;color:var(--text)">${p.name}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${p.client||''}</div></div>${badge(p.progress>=100?'Tamamlandı':p.status)}</div><div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-size:12px;color:var(--muted)">İlerleme</span><span style="font-size:13px;font-weight:800;color:${p.progress>=100?'var(--success)':'var(--accent)'}">${p.progress}%</span></div>${prog(p.progress)}<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><span style="font-size:13px;font-weight:700;color:var(--success)">${p.value?fmtEUR(p.value):''}</span><div class="btn-row" style="margin-top:0" onclick="event.stopPropagation()"><button class="btn-sm btn-edit" onclick="editProject('${p.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg></button><button class="btn-sm btn-del" onclick="delProject('${p.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg></button></div></div></div>`).join('')||'<div class="empty">Henüz proje eklenmedi</div>';document.getElementById('content').innerHTML=`<div class="page"><div class="page-title">Projeler</div><div class="page-sub">${active} aktif · ${done} tamamlandı</div>${cards}<div style="height:70px"></div></div>`;addFab(()=>openProjectForm());}
+function openProjectForm(p){const isEdit=!!p;const d=p||{name:'',client:'',startDate:today(),endDate:'',progress:0,status:'Devam Ediyor',value:'',notes:'',tasks:''};openSheet(`<div class="sheet-title">${isEdit?'Projeyi Düzenle':'Yeni Proje'}</div><label class="fl">Proje Adı</label><input id="p-name" value="${d.name}" placeholder="Netwerk installatie Alphen"/><label class="fl">Müşteri</label><input id="p-client" value="${d.client||''}" placeholder="Müşteri Adı"/><div class="grid2"><div><label class="fl">Başlangıç</label><input type="date" id="p-start" value="${d.startDate}"/></div><div><label class="fl">Bitiş</label><input type="date" id="p-end" value="${d.endDate||''}"/></div></div><div class="grid2"><div><label class="fl">Değer (€)</label><input type="number" id="p-val" value="${d.value||''}" placeholder="0.00" inputmode="decimal"/></div><div><label class="fl">Durum</label><select id="p-status">${PROJ_STATUSES.map(s=>`<option ${s===d.status?'selected':''}>${s}</option>`).join('')}</select></div></div><label class="fl">İlerleme: <span id="pct-label">${d.progress}</span>%</label><input type="range" id="p-prog" min="0" max="100" value="${d.progress}" oninput="document.getElementById('pct-label').textContent=this.value"/><label class="fl">Görevler</label><textarea id="p-tasks" placeholder="Kablo çekimi&#10;Patch panel&#10;Test &amp; ölçüm">${d.tasks||''}</textarea><label class="fl">Notlar</label><textarea id="p-notes" placeholder="Proje detayları...">${d.notes||''}</textarea><button class="btn-primary" onclick="saveProject('${isEdit?d.id:''}')">${isEdit?'Güncelle':'Kaydet'}</button>`);}
+function saveProject(id){const pro=DB.get('projects');const pct=+document.getElementById('p-prog').value;const item={id:id||uid(),name:document.getElementById('p-name').value,client:document.getElementById('p-client').value,startDate:document.getElementById('p-start').value,endDate:document.getElementById('p-end').value,value:document.getElementById('p-val').value,status:document.getElementById('p-status').value,progress:pct,tasks:document.getElementById('p-tasks').value,notes:document.getElementById('p-notes').value};if(!item.name)return;if(pct>=100)item.status='Tamamlandı';const updated=id?pro.map(p=>p.id===id?item:p):[item,...pro];DB.set('projects',updated);closeSheet();renderProjects();}
+function openProjectDetail(id){const p=DB.get('projects').find(x=>x.id===id);if(!p)return;openSheet(`<div class="sheet-title">${p.name}</div><div class="grid2" style="margin-bottom:14px"><div class="stat" style="padding:10px 12px"><div class="stat-label">Müşteri</div><div style="font-size:13px;font-weight:700;color:var(--text)">${p.client||'-'}</div></div><div class="stat" style="padding:10px 12px"><div class="stat-label">Değer</div><div style="font-size:13px;font-weight:700;color:var(--success)">${p.value?fmtEUR(p.value):'-'}</div></div><div class="stat" style="padding:10px 12px"><div class="stat-label">Başlangıç</div><div style="font-size:12px;color:var(--text)">${fmtDate(p.startDate)}</div></div><div class="stat" style="padding:10px 12px"><div class="stat-label">Bitiş</div><div style="font-size:12px;color:var(--text)">${fmtDate(p.endDate)}</div></div></div><label class="fl">İlerleme: <span id="det-pct">${p.progress}</span>%</label><input type="range" id="det-prog" min="0" max="100" value="${p.progress}" oninput="document.getElementById('det-pct').textContent=this.value" onchange="updateProgress('${p.id}',this.value)"/><div style="margin-top:8px">${prog(p.progress)}</div>${p.tasks?`<label class="fl">Görevler</label><div class="stat" style="padding:12px;margin-top:4px;white-space:pre-wrap;font-size:13px;color:var(--text)">${p.tasks}</div>`:''} ${p.notes?`<label class="fl">Notlar</label><div class="stat" style="padding:12px;margin-top:4px;white-space:pre-wrap;font-size:13px;color:var(--text)">${p.notes}</div>`:''}`);}
+function updateProgress(id,val){DB.set('projects',DB.get('projects').map(p=>p.id===id?{...p,progress:+val,status:+val>=100?'Tamamlandı':p.status}:p));}
+function editProject(id){const p=DB.get('projects').find(x=>x.id===id);if(p)openProjectForm(p);}
+function delProject(id){if(!confirm('Bu projeyi silmek istiyor musun?'))return;DB.set('projects',DB.get('projects').filter(p=>p.id!==id));renderProjects();}
+
+showTab('dashboard');
+</script>
+</body>
+</html>
