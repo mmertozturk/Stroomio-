@@ -19,7 +19,7 @@ html,body{height:100%;background:var(--navy);font-family:'Plus Jakarta Sans',san
 #header-title{font-size:17px;font-weight:800;color:var(--text);}
 #content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;}
 #bottom-nav{background:var(--navy3);border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-bottom);flex-shrink:0;}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px;border:none;background:none;color:var(--muted);font-size:9px;font-family:inherit;font-weight:600;cursor:pointer;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 1px;border:none;background:none;color:var(--muted);font-size:8px;font-family:inherit;font-weight:600;cursor:pointer;}
 .nav-btn.active{color:var(--blue2);}
 .nav-btn svg{width:20px;height:20px;}
 .card{background:var(--navy2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;}
@@ -89,7 +89,44 @@ textarea{resize:vertical;min-height:60px;}
 </style>
 </head>
 <body>
-<div id="app">
+<div id="lock-screen" style="position:fixed;inset:0;background:#0d1b2a;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
+  <div style="background:#122035;border:1px solid #1e3352;border-radius:20px;padding:32px 24px;max-width:320px;width:100%;text-align:center;">
+    <div style="width:56px;height:56px;background:#1a6fbf;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+    <div style="font-size:20px;font-weight:800;color:#e2eaf4;margin-bottom:4px;">ZZP Fatura Takibi</div>
+    <div id="auth-mode-label" style="font-size:12px;color:#7a9bbf;margin-bottom:20px;">Giriş yap veya kayıt ol</div>
+
+    <!-- Tab buttons -->
+    <div style="display:flex;gap:0;background:#0d1b2a;border-radius:10px;padding:4px;margin-bottom:20px;">
+      <button id="tab-login" onclick="switchAuthTab('login')" style="flex:1;padding:8px;border:none;border-radius:8px;background:#1a6fbf;color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Giriş Yap</button>
+      <button id="tab-register" onclick="switchAuthTab('register')" style="flex:1;padding:8px;border:none;border-radius:8px;background:none;color:#7a9bbf;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Kayıt Ol</button>
+    </div>
+
+    <!-- Login form -->
+    <div id="form-login">
+      <input type="text" id="login-user" placeholder="Kullanıcı adı" style="width:100%;background:#0d1b2a;border:1px solid #1e3352;border-radius:10px;padding:12px 14px;color:#e2eaf4;font-size:15px;font-family:inherit;outline:none;text-align:center;margin-bottom:8px;" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <input type="password" id="login-pwd" placeholder="Şifre" style="width:100%;background:#0d1b2a;border:1px solid #1e3352;border-radius:10px;padding:12px 14px;color:#e2eaf4;font-size:15px;font-family:inherit;outline:none;text-align:center;letter-spacing:3px;margin-bottom:12px;" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <button onclick="doLogin()" style="width:100%;background:#1a6fbf;color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;">Giriş Yap</button>
+    </div>
+
+    <!-- Register form -->
+    <div id="form-register" style="display:none;">
+      <input type="text" id="reg-name" placeholder="Adın (görünen isim)" style="width:100%;background:#0d1b2a;border:1px solid #1e3352;border-radius:10px;padding:12px 14px;color:#e2eaf4;font-size:15px;font-family:inherit;outline:none;text-align:center;margin-bottom:8px;" />
+      <input type="text" id="reg-user" placeholder="Kullanıcı adı" style="width:100%;background:#0d1b2a;border:1px solid #1e3352;border-radius:10px;padding:12px 14px;color:#e2eaf4;font-size:15px;font-family:inherit;outline:none;text-align:center;margin-bottom:8px;" />
+      <input type="password" id="reg-pwd" placeholder="Şifre seç" style="width:100%;background:#0d1b2a;border:1px solid #1e3352;border-radius:10px;padding:12px 14px;color:#e2eaf4;font-size:15px;font-family:inherit;outline:none;text-align:center;letter-spacing:3px;margin-bottom:8px;" />
+      <input type="password" id="reg-pwd2" placeholder="Şifreyi tekrarla" style="width:100%;background:#0d1b2a;border:1px solid #1e3352;border-radius:10px;padding:12px 14px;color:#e2eaf4;font-size:15px;font-family:inherit;outline:none;text-align:center;letter-spacing:3px;margin-bottom:12px;" />
+      <button onclick="doRegister()" style="width:100%;background:#059669;color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;">Kayıt Ol</button>
+    </div>
+
+    <div id="auth-error" style="color:#ef4444;font-size:12px;margin-top:12px;min-height:16px;"></div>
+    <div id="auth-success" style="display:none;margin-top:16px;background:rgba(5,150,105,.15);border:1px solid rgba(5,150,105,.3);border-radius:10px;padding:14px;">
+      <div style="font-size:14px;font-weight:700;color:#34d399;margin-bottom:6px;">✓ Kayıt isteği gönderildi!</div>
+      <div style="font-size:12px;color:#7a9bbf;">Admin onayından sonra giriş yapabilirsin.</div>
+    </div>
+  </div>
+</div>
+<div id="app" style="display:none;">
   <div id="header">
     <div id="header-logo">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
@@ -114,6 +151,10 @@ textarea{resize:vertical;min-height:60px;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
       Projeler
     </button>
+    <button class="nav-btn" data-tab="settings" onclick="showTab('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Ayarlar
+    </button>
     <button class="nav-btn" data-tab="calendar" onclick="showTab('calendar')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       Takvim
@@ -128,7 +169,13 @@ var PROJ_STATUSES=['Devam Ediyor','Tamamlandi','Bekliyor','Iptal'];
 var BTW_RATES=['21','9','0'];
 var EXP_CATS_PERSONAL=['Boodschappen','Restaurant en Eten','Kleding','Hypotheek / Huur','Elektriciteit en Gas','Water','Telefoon (Prive)','Internet (Prive)','Zorgverzekering','Auto Verzekering','Brandstof (Prive)','Abonnement / Streaming','Sport en Fitness','Reizen en Vakantie','Diger'];
 var EXP_CATS_BUSINESS=['Arac ve Yakit (Zakelijk)','Alet ve Ekipman','Materiaal / Kabel','Telefoon (Zakelijk)','Internet (Zakelijk)','Yazilim ve Abonelik','Beroepsaansprakelijkheid','Pensioen','Opleiding en Cursus','Kantoorbenodigdheden','Belasting / BTW','Diger Zakelijk'];
-var DB={get:function(k){try{return JSON.parse(localStorage.getItem('stroomio_'+k)||'[]');}catch(e){return[];}},set:function(k,v){localStorage.setItem('stroomio_'+k,JSON.stringify(v));},getObj:function(k,def){try{return JSON.parse(localStorage.getItem('stroomio_'+k)||JSON.stringify(def));}catch(e){return def;}},setObj:function(k,v){localStorage.setItem('stroomio_'+k,JSON.stringify(v));}};
+var _syncTimer=null;
+var DB={
+  get:function(k){try{return JSON.parse(localStorage.getItem('stroomio_'+k)||'[]');}catch(e){return[];}},
+  set:function(k,v){localStorage.setItem('stroomio_'+k,JSON.stringify(v));if(_syncTimer)clearTimeout(_syncTimer);_syncTimer=setTimeout(autoSync,1500);},
+  getObj:function(k,def){try{return JSON.parse(localStorage.getItem('stroomio_'+k)||JSON.stringify(def));}catch(e){return def;}},
+  setObj:function(k,v){localStorage.setItem('stroomio_'+k,JSON.stringify(v));if(_syncTimer)clearTimeout(_syncTimer);_syncTimer=setTimeout(autoSync,1500);}
+};
 function fmtEUR(n){return new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(+n||0);}
 function fmtDate(d){return d?new Date(d).toLocaleDateString('nl-NL',{day:'2-digit',month:'2-digit',year:'numeric'}):'-';}
 function today(){return new Date().toISOString().split('T')[0];}
@@ -136,13 +183,141 @@ function addDays(d,n){var dt=new Date(d);dt.setDate(dt.getDate()+n);return dt.to
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 function pa(v){if(!v&&v!==0)return 0;return parseFloat(String(v).replace(',','.'))||0;}
 function calcBTW(a,r){return Math.round(pa(a)*pa(r)/100*100)/100;}
-function getSettings(){return DB.getObj('settings',{name:'Stroomio',address:'Hengelolaan 894',city:"2544GJ 's-Gravenhage",phone:'0653308372',email:'muminmertozturk@hotmail.com',iban:'NL85 KNAB 0777 2058 31',btwNr:'NL005377004B46',kvk:'99233967'});}
+function getSettings(){return DB.getObj('settings',{name:'',address:'',city:'',phone:'',email:'',iban:'',btwNr:'',kvk:''});}
 function sortInv(inv){return inv.slice().sort(function(a,b){var na=String(a.invoiceNo).replace(/[^0-9]/g,'');var nb=String(b.invoiceNo).replace(/[^0-9]/g,'');while(na.length<nb.length)na='0'+na;while(nb.length<na.length)nb='0'+nb;return nb>na?1:nb<na?-1:0;});}
 function getTaskPct(t){if(!t)return 0;if(t.nvt)return 0;if(t.done!==undefined){var x=+t.total||1;return x>0?Math.min(Math.round(+t.done/x*100),100):0;}return +t.pct||0;}
 function calcLocPct(l){var ts=l.tasks||{};var tot=0,cnt=0;TASK_TYPES.forEach(function(t){var tk=ts[t.key]||{done:0,total:1,nvt:false};if(!tk.nvt){tot+=getTaskPct(tk);cnt++;}});return cnt>0?Math.round(tot/cnt):100;}
 function calcProjPct(p){var locs=p.locaties||[];if(!locs.length)return 0;var tot=0;locs.forEach(function(l){tot+=calcLocPct(l);});return Math.round(tot/locs.length);}
 function saveCustomer(name,address,btwNr){if(!name)return;var cl=DB.get('customers');if(cl.filter(function(c){return c.name===name;}).length>0)return;cl.unshift({id:uid(),name:name,address:address||'',btwNr:btwNr||''});if(cl.length>20)cl=cl.slice(0,20);DB.set('customers',cl);}
-function checkAutoBetaald(){var inv=DB.get('invoices');var ts=today();var am=[];var upd=inv.map(function(i){if(i.status==='Beklemede'&&i.dueDate&&i.dueDate<=ts){am.push({name:i.client,amt:i.amount});i.status='Betaald';i.autoMarked=true;}return i;});if(am.length){DB.set('invoices',upd);sessionStorage.setItem('stroomio_notify',JSON.stringify(am));}}
+var CURRENT_USER=null;
+var CURRENT_DISPLAY=null;
+var CLOUD_URL='https://project-manager-api.muminmertozturk.workers.dev';
+var _syncTimer=null;
+
+function switchAuthTab(tab){
+  var loginForm=document.getElementById('form-login');
+  var regForm=document.getElementById('form-register');
+  var tabLogin=document.getElementById('tab-login');
+  var tabReg=document.getElementById('tab-register');
+  var err=document.getElementById('auth-error');
+  var suc=document.getElementById('auth-success');
+  if(err)err.textContent='';
+  if(suc)suc.style.display='none';
+  if(tab==='login'){
+    if(loginForm)loginForm.style.display='';
+    if(regForm)regForm.style.display='none';
+    if(tabLogin)tabLogin.style.cssText='flex:1;padding:8px;border:none;border-radius:8px;background:#1a6fbf;color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;';
+    if(tabReg)tabReg.style.cssText='flex:1;padding:8px;border:none;border-radius:8px;background:none;color:#7a9bbf;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;';
+    setTimeout(function(){var e=document.getElementById('login-user');if(e)e.focus();},100);
+  } else {
+    if(loginForm)loginForm.style.display='none';
+    if(regForm)regForm.style.display='';
+    if(tabLogin)tabLogin.style.cssText='flex:1;padding:8px;border:none;border-radius:8px;background:none;color:#7a9bbf;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;';
+    if(tabReg)tabReg.style.cssText='flex:1;padding:8px;border:none;border-radius:8px;background:#059669;color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;';
+    setTimeout(function(){var e=document.getElementById('reg-name');if(e)e.focus();},100);
+  }
+}
+
+function doLogin(){
+  var usr=(document.getElementById('login-user')||{}).value.trim().toLowerCase();
+  var pwd=(document.getElementById('login-pwd')||{}).value;
+  var err=document.getElementById('auth-error');
+  if(!usr||!pwd){err.textContent='Kullanıcı adı ve şifre gerekli';return;}
+  err.textContent='Kontrol ediliyor...';
+  // Fetch user from cloud
+  fetch(CLOUD_URL+'/zzp-users/'+usr)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(!data||!data.username){err.textContent='Kullanıcı bulunamadı';return;}
+      if(data.status==='pending'){err.textContent='Hesabın henüz onaylanmadı. Admin onayı bekleniyor.';return;}
+      if(data.status==='rejected'){err.textContent='Hesabın reddedildi.';return;}
+      if(data.password!==pwd){err.textContent='Şifre yanlış';return;}
+      // Login success
+      CURRENT_USER=usr;
+      CURRENT_DISPLAY=data.name||usr;
+      document.getElementById('lock-screen').remove();
+      document.getElementById('app').style.display='flex';
+      var hdrTitle=document.getElementById('header-title');
+      if(hdrTitle)hdrTitle.textContent='ZZP - '+CURRENT_DISPLAY;
+      loadFromCloud();
+    })
+    .catch(function(){
+      err.textContent='Bağlantı hatası. Tekrar dene.';
+    });
+}
+
+function doRegister(){
+  var name=(document.getElementById('reg-name')||{}).value.trim();
+  var usr=(document.getElementById('reg-user')||{}).value.trim().toLowerCase().replace(/\s+/g,'-');
+  var pwd=(document.getElementById('reg-pwd')||{}).value;
+  var pwd2=(document.getElementById('reg-pwd2')||{}).value;
+  var err=document.getElementById('auth-error');
+  if(!name||!usr||!pwd){err.textContent='Tüm alanları doldur';return;}
+  if(pwd!==pwd2){err.textContent='Şifreler eşleşmiyor';return;}
+  if(usr.length<3){err.textContent='Kullanıcı adı en az 3 karakter olmalı';return;}
+  err.textContent='Kaydediliyor...';
+  var userData={username:usr,name:name,password:pwd,status:'pending',createdAt:new Date().toISOString()};
+  fetch(CLOUD_URL+'/zzp-users/'+usr,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(userData)
+  }).then(function(r){
+    if(r.ok){
+      document.getElementById('form-register').style.display='none';
+      document.getElementById('auth-success').style.display='';
+      err.textContent='';
+    } else {
+      err.textContent='Kayıt başarısız. Tekrar dene.';
+    }
+  }).catch(function(){
+    err.textContent='Bağlantı hatası.';
+  });
+}
+
+setTimeout(function(){var e=document.getElementById('login-user');if(e)e.focus();},200);
+
+function loadFromCloud(){
+  if(!CURRENT_USER)return;
+  fetch(CLOUD_URL+'/zzp/'+CURRENT_USER)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(data&&typeof data==='object'){
+        if(data.invoices)localStorage.setItem('stroomio_invoices',JSON.stringify(data.invoices));
+        if(data.exp_personal)localStorage.setItem('stroomio_exp_personal',JSON.stringify(data.exp_personal));
+        if(data.exp_business)localStorage.setItem('stroomio_exp_business',JSON.stringify(data.exp_business));
+        if(data.projects)localStorage.setItem('stroomio_projects',JSON.stringify(data.projects));
+        if(data.settings)localStorage.setItem('stroomio_settings',JSON.stringify(data.settings));
+        if(data.customers)localStorage.setItem('stroomio_customers',JSON.stringify(data.customers));
+      }
+      checkAutoBetaald();
+      showTab('dashboard');
+    })
+    .catch(function(){
+      checkAutoBetaald();
+      showTab('dashboard');
+    });
+}
+
+function autoSync(){
+  if(!CURRENT_USER)return;
+  if(_syncTimer)clearTimeout(_syncTimer);
+  _syncTimer=setTimeout(function(){
+    var data={
+      invoices:DB.get('invoices'),
+      exp_personal:DB.get('exp_personal'),
+      exp_business:DB.get('exp_business'),
+      projects:DB.get('projects'),
+      customers:DB.get('customers'),
+      settings:DB.getObj('settings',{})
+    };
+    fetch(CLOUD_URL+'/zzp/'+CURRENT_USER,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    }).catch(function(){});
+  },1500);
+}
+
+function checkAutoBetaald(){var inv=DB.get('invoices');var ts=today();var am=[];var upd=inv.map(function(i){if(i.status==='Beklemede'&&i.dueDate&&i.dueDate<ts){am.push({name:i.client,amt:i.amount});i.status='Gecikmis';i.autoMarked=true;}return i;});if(am.length){DB.set('invoices',upd);sessionStorage.setItem('stroomio_notify',JSON.stringify(am));}}
 function notifyBanner(){var raw=sessionStorage.getItem('stroomio_notify');if(!raw)return'';var list=JSON.parse(raw);if(!list.length)return'';var items=list.map(function(x){return'<div style="font-size:12px;color:var(--text);padding:2px 0">- '+x.name+' '+fmtEUR(x.amt)+'</div>';}).join('');return'<div id="notify-banner" class="warn-box"><div style="display:flex;justify-content:space-between"><div><div class="warn-title">Otomatik Betaald yapildi!</div>'+items+'<div style="font-size:11px;color:var(--muted);margin-top:6px">Bu faturalarin gercekten yattigini kontrol et!</div></div><button onclick="dismissNotify()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px">x</button></div></div>';}
 function dismissNotify(){sessionStorage.removeItem('stroomio_notify');var el=document.getElementById('notify-banner');if(el)el.remove();}
 function badge(s){var m={'Betaald':'badge-green','Beklemede':'badge-warn','Gecikmis':'badge-red','Iptal':'badge-red','Devam Ediyor':'badge-blue','Tamamlandi':'badge-green','Bekliyor':'badge-warn'};return'<span class="badge '+(m[s]||'badge-blue')+'">'+s+'</span>';}
@@ -150,7 +325,7 @@ function prog(p){var c=p>=100?'var(--success)':'var(--blue2)';return'<div class=
 function addFab(fn){var f=document.createElement('button');f.className='fab';f.innerHTML='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';f.onclick=fn;document.body.appendChild(f);}
 function openSheet(html){var ov=document.createElement('div');ov.className='overlay';ov.innerHTML='<div class="sheet"><div class="sheet-handle"></div>'+html+'</div>';ov.addEventListener('click',function(e){if(e.target===ov)closeSheet();});document.body.appendChild(ov);}
 function closeSheet(){var o=document.querySelectorAll('.overlay');if(o.length)o[o.length-1].remove();}
-function showTab(tab){document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});var el=document.getElementById('content');el.scrollTop=0;el.innerHTML='';var fab=document.querySelector('.fab');if(fab)fab.remove();if(tab==='dashboard')renderDashboard();else if(tab==='invoices')renderInvoices();else if(tab==='expenses')renderExpenses();else if(tab==='projects')renderProjects();else if(tab==='calendar')renderCalendar();}
+function showTab(tab){document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});var el=document.getElementById('content');el.scrollTop=0;el.innerHTML='';var fab=document.querySelector('.fab');if(fab)fab.remove();if(tab==='dashboard')renderDashboard();else if(tab==='invoices')renderInvoices();else if(tab==='expenses')renderExpenses();else if(tab==='projects')renderProjects();else if(tab==='calendar')renderCalendar();else if(tab==='settings')renderSettings();}
 var res30State=false;
 function toggleRes30(){res30State=!res30State;var b=document.getElementById('res30-box');if(b){b.className='chk-box'+(res30State?' checked':'');b.innerHTML=res30State?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>':'';}};
 function renderDashboard(){var inv=DB.get('invoices'),expP=DB.get('exp_personal'),expB=DB.get('exp_business'),pro=DB.get('projects');var paid=inv.filter(function(i){return i.status==='Betaald';}).reduce(function(s,i){return s+pa(i.amount);},0);var pend=inv.filter(function(i){return i.status==='Beklemede';}).reduce(function(s,i){return s+pa(i.amount);},0);var totalExp=expP.reduce(function(s,e){return s+pa(e.amount);},0)+expB.reduce(function(s,e){return s+pa(e.amount);},0);var net=paid-totalExp;var activeP=pro.filter(function(p){return calcProjPct(p)<100;}).length;var res=inv.filter(function(i){return i.status==='Betaald'&&i.reserved30;}).reduce(function(s,i){return s+pa(i.amount)*0.3;},0);var unres=inv.filter(function(i){return i.status==='Betaald'&&!i.reserved30;});var unHtml='';if(unres.length){var uI=unres.map(function(i){return'<div style="display:flex;justify-content:space-between;padding:3px 0"><span style="font-size:12px;color:var(--text)">'+i.client+'</span><span style="font-size:12px;color:var(--warn);font-weight:700">'+fmtEUR(pa(i.amount)*0.3)+' ayrilmadi</span></div>';}).join('');unHtml='<div class="warn-box"><div class="warn-title">%30 Ayrilmamis Odemeler</div>'+uI+'</div>';}var recent=sortInv(inv).slice(0,5);var rRows=recent.map(function(i){var w=(i.status==='Betaald'&&!i.reserved30)?'<div class="reserved-warn">%30 ayrilmadi</div>':'';return'<div class="row"><div class="row-main"><div class="row-name">'+i.client+'</div><div class="row-sub">'+i.invoiceNo+' - '+fmtDate(i.date)+'</div></div><div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:800;color:var(--text)">'+fmtEUR(pa(i.amount))+'</div>'+badge(i.status)+w+'</div></div>';}).join('')||'<div class="empty">Henuz fatura yok</div>';var pRows=pro.slice(0,4).map(function(p){var pct=calcProjPct(p);return'<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:700;color:var(--text)">'+p.name+'</span><span style="font-size:13px;font-weight:800;color:'+(pct>=100?'var(--success)':'var(--accent)')+'">'+pct+'%</span></div>'+prog(pct)+'</div>';}).join('')||'<div class="empty">Henuz proje yok</div>';var nc=net>=0?'var(--success)':'var(--danger)';document.getElementById('content').innerHTML='<div class="page"><div class="page-title">Dashboard</div><div class="stat-grid" style="margin-top:12px"><div class="stat"><div class="stat-label">Toplam Gelir</div><div class="stat-val" style="color:var(--success)">'+fmtEUR(paid)+'</div></div><div class="stat"><div class="stat-label">Bekleyen</div><div class="stat-val" style="color:var(--warn)">'+fmtEUR(pend)+'</div></div><div class="stat"><div class="stat-label">Giderler</div><div class="stat-val" style="color:var(--danger)">'+fmtEUR(totalExp)+'</div></div><div class="stat"><div class="stat-label">Net Kar</div><div class="stat-val" style="color:'+nc+'">'+fmtEUR(net)+'</div></div></div><div class="stat-grid"><div class="stat" style="border-color:#4fc3f744"><div class="stat-label">30% Rezerv</div><div class="stat-val" style="color:var(--accent);font-size:16px">'+fmtEUR(res)+'</div><div style="font-size:10px;color:var(--muted);margin-top:3px">Emeklilik ve Vergi</div></div><div class="stat"><div class="stat-label">Aktif Proje</div><div class="stat-val" style="color:var(--blue2)">'+activeP+'</div></div></div>'+unHtml+'<div class="card"><div class="card-title">Son Faturalar</div>'+rRows+'</div><div class="card"><div class="card-title">Proje Durumu</div>'+pRows+'</div></div>';}
@@ -169,7 +344,7 @@ function openInvoiceForm(inv){
     });
     chips+='</div>';
   }
-  var amtVal=d.amount?String(pa(d.amount).toFixed(2)).replace('.',','):'';
+  var amtVal=(d.amount!=null&&d.amount!==''&&d.amount!==0)?String(pa(d.amount).toFixed(2)).replace('.',','):'';
   var saveId=isE?d.id:'';
   var h='<div class="sheet-header"><div class="sheet-title">'+(isE?'Fatura Duzenle':'Yeni Fatura')+'</div><button class="sheet-close" onclick="closeSheet()">Kapat</button></div>';
   h+=chips;
@@ -193,11 +368,19 @@ function openInvoiceForm(inv){
 function autoSetDue(){var d=document.getElementById('f-date');var due=document.getElementById('f-due');if(d&&due&&d.value)due.value=addDays(d.value,30);}
 function saveInvoice(id){
   var client=(document.getElementById('f-client')||{}).value||'';
-  var amount=pa((document.getElementById('f-amount')||{}).value);
-  if(!client||!amount)return;
+  var amountRaw=(document.getElementById('f-amount')||{}).value;
+  var amount=pa(amountRaw);
+  if(!client)return;
+  // On new invoice, amount required. On edit, keep existing if empty
+  if(!amount&&!id)return;
+  if(!amount&&id){
+    var existing=DB.get('invoices').filter(function(x){return x.id===id;})[0];
+    if(existing)amount=existing.amount||0;
+  }
   var status=(document.getElementById('f-status')||{}).value||'Beklemede';
   if(status==='Betaald'&&!res30State){if(!confirm('%30 henuz ayrilmamis. Yine de kaydet?'))return;}
-  var item={id:id||uid(),client:client,clientAddress:(document.getElementById('f-client-addr')||{}).value||'',clientBtwNr:(document.getElementById('f-client-btw')||{}).value||'',invoiceNo:(document.getElementById('f-no')||{}).value||'',date:(document.getElementById('f-date')||{}).value||'',dueDate:(document.getElementById('f-due')||{}).value||'',status:status,amount:amount,werkregels:[],reserved30:res30State};
+  var existingInv=id?DB.get('invoices').filter(function(x){return x.id===id;})[0]:null;
+  var item={id:id||uid(),client:client,clientAddress:(document.getElementById('f-client-addr')||{}).value||'',clientBtwNr:(document.getElementById('f-client-btw')||{}).value||'',invoiceNo:(document.getElementById('f-no')||{}).value||'',date:(document.getElementById('f-date')||{}).value||'',dueDate:(document.getElementById('f-due')||{}).value||'',status:status,amount:amount,werkregels:(existingInv&&existingInv.werkregels)||[],reserved30:res30State};
   var inv=DB.get('invoices');
   var upd=id?inv.map(function(i){return i.id===id?item:i;}):[item].concat(inv);
   DB.set('invoices',upd);
@@ -222,7 +405,7 @@ function editExpB(id){var e=DB.get('exp_business').filter(function(x){return x.i
 function delExpP(id){if(!confirm('Silmek istiyor musun?'))return;DB.set('exp_personal',DB.get('exp_personal').filter(function(e){return e.id!==id;}));renderExpenseList();}
 function delExpB(id){if(!confirm('Silmek istiyor musun?'))return;DB.set('exp_business',DB.get('exp_business').filter(function(e){return e.id!==id;}));renderExpenseList();}
 function openBTWAangifte(){var y=new Date().getFullYear();var yO=[y-1,y,y+1].map(function(yr){return'<option value="'+yr+'"'+(yr===y?' selected':'')+'>'+yr+'</option>';}).join('');var qO=['Q1 (Jan-Mrt)','Q2 (Apr-Jun)','Q3 (Jul-Sep)','Q4 (Okt-Dec)'].map(function(q,i){return'<option value="'+(i+1)+'">'+q+'</option>';}).join('');openSheet('<div class="sheet-title">BTW Aangifte Raporu</div><label class="fl">Kwartaal</label><select id="btw-q">'+qO+'</select><label class="fl">Jaar</label><select id="btw-y">'+yO+'</select><div class="warn-box" style="margin-top:16px"><div style="font-size:12px;color:var(--text)">Sadece Zakelijk sekmesindeki harcamalar dahil edilir. BTW verlegd oldugu icin faturalar dahil edilmez.</div></div><button class="btn-primary" onclick="genBTWReport()">Rapor Olustur</button>');}
-function genBTWReport(){var q=+document.getElementById('btw-q').value;var yr=+document.getElementById('btw-y').value;var qs=['','01-01','04-01','07-01','10-01'];var qe=['','03-31','06-30','09-30','12-31'];var s=yr+'-'+qs[q];var e=yr+'-'+qe[q];var qN=['','Q1 (Januari-Maart)','Q2 (April-Juni)','Q3 (Juli-September)','Q4 (Oktober-December)'];var biz=DB.get('exp_business').filter(function(x){return x.date>=s&&x.date<=e;});var vEx=biz.reduce(function(t,x){return t+pa(x.amount);},0);var vBTW=biz.reduce(function(t,x){return t+pa(x.btwAmount||0);},0);var eR=biz.map(function(x){var b=pa(x.btwAmount||0);var t=pa(x.amount)+b;return'<tr><td>'+fmtDate(x.date)+'</td><td>'+x.description+'</td><td>'+x.category+'</td><td style="text-align:right">'+fmtEUR(pa(x.amount))+'</td><td style="text-align:right">'+(x.btwRate||0)+'%</td><td style="text-align:right">'+fmtEUR(b)+'</td><td style="text-align:right">'+fmtEUR(t)+'</td></tr>';}).join('');var html='<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>BTW Aangifte</title><style>body{font-family:Arial,sans-serif;font-size:12px;margin:20px;}h1{font-size:20px;color:#0d1b2a;}h2{font-size:14px;color:#1a6fbf;margin:20px 0 8px;border-bottom:2px solid #1a6fbf;padding-bottom:4px;}table{width:100%;border-collapse:collapse;margin-bottom:16px;}th{background:#0d1b2a;color:#fff;padding:7px 8px;text-align:left;font-size:11px;}td{padding:6px 8px;border-bottom:1px solid #e5e7eb;font-size:11px;}.sum-box{background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin:16px 0;max-width:420px;}.sum-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid #e5e7eb;}.sum-total{display:flex;justify-content:space-between;padding:10px 0 0;font-size:16px;font-weight:bold;color:#16a34a;}.print-btn{background:#1a6fbf;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:14px;margin-bottom:16px;}@media print{.print-btn{display:none;}}</style></head><body><button class="print-btn" onclick="window.print()">Yazdir / PDF Kaydet</button><h1>BTW Aangifte - ZZP Fatura Takibi</h1><p>Periode: <strong>'+qN[q]+' '+yr+'</strong></p><div class="sum-box"><div class="sum-row"><span>1a. Omzetbelasting:</span><span>0,00</span></div><div class="sum-row"><span>Zakelijke kosten (ex BTW):</span><span>'+fmtEUR(vEx)+'</span></div><div class="sum-row"><span>5b. Voorbelasting:</span><span>'+fmtEUR(vBTW)+'</span></div><div class="sum-total"><span>Terug te ontvangen:</span><span>'+fmtEUR(vBTW)+'</span></div></div><h2>Zakelijke Kosten</h2><table><thead><tr><th>Datum</th><th>Omschrijving</th><th>Categorie</th><th>Ex BTW</th><th>BTW %</th><th>BTW</th><th>Totaal</th></tr></thead><tbody>'+(eR||'<tr><td colspan="7" style="text-align:center;color:#888">Geen kosten</td></tr>')+'</tbody></table></body></html>';var w=window.open('','_blank');if(w){w.document.write(html);w.document.close();}else{alert('Pop-up engellendi.');}closeSheet();}
+function genBTWReport(){var q=+document.getElementById('btw-q').value;var yr=+document.getElementById('btw-y').value;var qs=['','01-01','04-01','07-01','10-01'];var qe=['','03-31','06-30','09-30','12-31'];var s=yr+'-'+qs[q];var e=yr+'-'+qe[q];var qN=['','Q1 (Januari-Maart)','Q2 (April-Juni)','Q3 (Juli-September)','Q4 (Oktober-December)'];var biz=DB.get('exp_business').filter(function(x){return x.date>=s&&x.date<=e;});var vEx=biz.reduce(function(t,x){return t+pa(x.amount);},0);var vBTW=biz.reduce(function(t,x){return t+pa(x.btwAmount||0);},0);var eR=biz.map(function(x){var b=pa(x.btwAmount||0);var t=pa(x.amount)+b;return'<tr><td>'+fmtDate(x.date)+'</td><td>'+x.description+'</td><td>'+x.category+'</td><td style="text-align:right">'+fmtEUR(pa(x.amount))+'</td><td style="text-align:right">'+(x.btwRate||0)+'%</td><td style="text-align:right">'+fmtEUR(b)+'</td><td style="text-align:right">'+fmtEUR(t)+'</td></tr>';}).join('');var html='<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>BTW Aangifte</title><style>body{font-family:Arial,sans-serif;font-size:12px;margin:20px;}h1{font-size:20px;color:#0d1b2a;}h2{font-size:14px;color:#1a6fbf;margin:20px 0 8px;border-bottom:2px solid #1a6fbf;padding-bottom:4px;}table{width:100%;border-collapse:collapse;margin-bottom:16px;}th{background:#0d1b2a;color:#fff;padding:7px 8px;text-align:left;font-size:11px;}td{padding:6px 8px;border-bottom:1px solid #e5e7eb;font-size:11px;}.sum-box{background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin:16px 0;max-width:420px;}.sum-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid #e5e7eb;}.sum-total{display:flex;justify-content:space-between;padding:10px 0 0;font-size:16px;font-weight:bold;color:#16a34a;}.print-btn{background:#1a6fbf;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:14px;margin-bottom:16px;}@media print{.print-btn{display:none;}}</style></head><body><button class="print-btn" onclick="window.print()">Yazdir / PDF Kaydet</button><h1>BTW Aangifte - ZZP Fatura Takibi</h1><p>Periode: <strong>'+qN[q]+' '+yr+'</strong></p><div class="sum-box"><div class="sum-row"><span>1a. Omzetbelasting:</span><span>0,00</span></div><div class="sum-row"><span>Zakelijke kosten (ex BTW):</span><span>'+fmtEUR(vEx)+'</span></div><div class="sum-row"><span>5b. Voorbelasting:</span><span>'+fmtEUR(vBTW)+'</span></div><div class="sum-total"><span>Terug te ontvangen:</span><span>'+fmtEUR(vBTW)+'</span></div></div><h2>Zakelijke Kosten</h2><table><thead><tr><th>Datum</th><th>Omschrijving</th><th>Categorie</th><th>Ex BTW</th><th>BTW %</th><th>BTW</th><th>Totaal</th></tr></thead><tbody>'+(eR||'<tr><td colspan="7" style="text-align:center;color:#888">Geen kosten</td></tr>')+'</tbody></table></div></body></html>';var w=window.open('','_blank');if(w){w.document.write(html);w.document.close();}else{alert('Pop-up engellendi.');}closeSheet();}
 function renderProjects(){var pro=DB.get('projects');var a=pro.filter(function(p){return calcProjPct(p)<100;}).length;var d=pro.filter(function(p){return calcProjPct(p)>=100;}).length;var cards=pro.map(function(p){var pct=calcProjPct(p);var locs=p.locaties||[];var mw=p.meerwerk||[];var col=pct>=100?'var(--success)':'var(--accent)';var sl=pct>=100?'Tamamlandi':p.status;var vH=p.value?'<span style="font-size:13px;font-weight:700;color:var(--success)">'+fmtEUR(pa(p.value))+'</span>':'';var mH=mw.length?'<span style="font-size:11px;color:var(--accent);margin-left:8px">'+mw.length+' meerwerk</span>':'';return'<div class="card" style="cursor:pointer" onclick="openProjectDetail(\''+p.id+'\')"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:800;color:var(--text)">'+p.name+'</div><div style="font-size:12px;color:var(--muted);margin-top:2px">'+(p.client||'')+'</div></div>'+badge(sl)+'</div><div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-size:12px;color:var(--muted)">'+locs.length+' locatie</span><span style="font-size:13px;font-weight:800;color:'+col+'">'+pct+'%</span></div>'+prog(pct)+'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><div>'+vH+mH+'</div><div class="btn-row" style="margin-top:0" onclick="event.stopPropagation()"><button class="btn-sm btn-edit" onclick="editProject(\''+p.id+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg></button><button class="btn-sm btn-del" onclick="delProject(\''+p.id+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg></button></div></div></div>';}).join('')||'<div class="empty">Henuz proje eklenmedi</div>';document.getElementById('content').innerHTML='<div class="page"><div class="page-title">Projeler</div><div class="page-sub">'+a+' aktif - '+d+' tamamlandi</div>'+cards+'<div style="height:70px"></div></div>';addFab(function(){openProjectForm(null);});}
 function openProjectForm(p){var isE=!!p;var d=p||{name:'',client:'',startDate:today(),endDate:'',status:'Devam Ediyor',value:'',notes:''};var sO=PROJ_STATUSES.map(function(s){return'<option'+(s===d.status?' selected':'')+'>'+s+'</option>';}).join('');var vS=d.value?String(pa(d.value).toFixed(2)).replace('.',','):'';openSheet('<div class="sheet-header"><div class="sheet-title">'+(isE?'Proje Duzenle':'Yeni Proje')+'</div><button class="sheet-close" onclick="closeSheet()">Kapat</button></div><label class="fl">Proje Adi</label><input id="p-name" value="'+d.name+'" placeholder="Harvest House..."/><label class="fl">Musteri</label><input id="p-client" value="'+(d.client||'')+'" placeholder="Musteri Adi"/><div class="grid2"><div><label class="fl">Baslangic</label><input type="date" id="p-start" value="'+d.startDate+'"/></div><div><label class="fl">Bitis</label><input type="date" id="p-end" value="'+(d.endDate||'')+'"/></div></div><label class="fl">Proje Degeri (EUR)</label><input type="text" inputmode="decimal" id="p-val" value="'+vS+'" placeholder="0,00"/><label class="fl">Durum</label><select id="p-status">'+sO+'</select><label class="fl">Notlar</label><textarea id="p-notes" placeholder="Proje detaylari...">'+(d.notes||'')+'</textarea><button class="btn-primary" onclick="saveProject(\''+(isE?d.id:'')+'\''+')">'+(isE?'Guncelle':'Kaydet')+'</button>');}
 function saveProject(id){var pro=DB.get('projects');var ex=id?pro.filter(function(p){return p.id===id;})[0]:null;var item={id:id||uid(),name:(document.getElementById('p-name')||{}).value||'',client:(document.getElementById('p-client')||{}).value||'',startDate:(document.getElementById('p-start')||{}).value||'',endDate:(document.getElementById('p-end')||{}).value||'',value:pa((document.getElementById('p-val')||{}).value),status:(document.getElementById('p-status')||{}).value||'',notes:(document.getElementById('p-notes')||{}).value||'',locaties:ex?ex.locaties||[]:[],meerwerk:ex?ex.meerwerk||[]:[],};if(!item.name)return;if(calcProjPct(item)>=100)item.status='Tamamlandi';var upd=id?pro.map(function(p){return p.id===id?item:p;}):[item].concat(pro);DB.set('projects',upd);closeSheet();renderProjects();}
@@ -246,6 +429,101 @@ function delProject(id){if(!confirm('Silmek istiyor musun?'))return;DB.set('proj
 
 
 
+function openAdminPanel(){
+  var ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;display:flex;flex-direction:column;';
+  var tb=document.createElement('div');
+  tb.style.cssText='background:#122035;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid #1e3352;';
+  var ttl=document.createElement('span');ttl.style.cssText='color:#e2eaf4;font-size:15px;font-weight:800;';ttl.textContent='Admin Panel - Kullanıcılar';
+  var btnClose=document.createElement('button');btnClose.textContent='Kapat';
+  btnClose.style.cssText='background:#1e3352;color:#94a3b8;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;';
+  btnClose.addEventListener('click',function(){ov.remove();});
+  tb.appendChild(ttl);tb.appendChild(btnClose);
+  var content=document.createElement('div');
+  content.style.cssText='flex:1;overflow-y:auto;padding:16px;';
+  content.innerHTML='<div style="color:#7a9bbf;font-size:13px;text-align:center;padding:20px;">Yükleniyor...</div>';
+  ov.appendChild(tb);ov.appendChild(content);document.body.appendChild(ov);
+
+  fetch(CLOUD_URL+'/zzp-admin/users',{headers:{'X-Admin-Key':'78159228Mo'}})
+    .then(function(r){return r.json();})
+    .then(function(users){
+      content.innerHTML='';
+      if(!users.length){
+        content.innerHTML='<div style="color:#7a9bbf;padding:20px;text-align:center;">Henüz kayıtlı kullanıcı yok</div>';
+        return;
+      }
+      var pending=users.filter(function(u){return u.status==='pending';});
+      var approved=users.filter(function(u){return u.status==='approved';});
+
+      function makeUserCard(u){
+        var card=document.createElement('div');
+        card.style.cssText='background:#1a1a0a;border:1px solid #f59e0b33;border-radius:12px;padding:14px;margin-bottom:10px;';
+        var nameEl=document.createElement('div');nameEl.style.cssText='font-size:14px;font-weight:700;color:#e2eaf4;margin-bottom:4px;';nameEl.textContent=u.name;
+        var unEl=document.createElement('div');unEl.style.cssText='font-size:12px;color:#7a9bbf;margin-bottom:10px;';unEl.textContent='@'+u.username;
+        var btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:8px;';
+        var btnOk=document.createElement('button');btnOk.textContent='Onayla';
+        btnOk.style.cssText='flex:1;background:rgba(5,150,105,.2);border:1px solid rgba(5,150,105,.4);color:#34d399;border-radius:8px;padding:8px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;';
+        btnOk.addEventListener('click',function(){approveUser(u.username,ov);});
+        var btnNo=document.createElement('button');btnNo.textContent='Reddet';
+        btnNo.style.cssText='flex:1;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#ef4444;border-radius:8px;padding:8px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;';
+        btnNo.addEventListener('click',function(){rejectUser(u.username,ov);});
+        btnRow.appendChild(btnOk);btnRow.appendChild(btnNo);
+        card.appendChild(nameEl);card.appendChild(unEl);card.appendChild(btnRow);
+        return card;
+      }
+
+      if(pending.length){
+        var lbl=document.createElement('div');lbl.style.cssText='font-size:11px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;';lbl.textContent='Onay Bekleyen ('+pending.length+')';
+        content.appendChild(lbl);
+        pending.forEach(function(u){content.appendChild(makeUserCard(u));});
+      }
+      if(approved.length){
+        var lbl2=document.createElement('div');lbl2.style.cssText='font-size:11px;font-weight:700;color:#34d399;text-transform:uppercase;letter-spacing:.08em;margin:16px 0 10px;';lbl2.textContent='Onaylı Kullanıcılar ('+approved.length+')';
+        content.appendChild(lbl2);
+        approved.forEach(function(u){
+          var row=document.createElement('div');
+          row.style.cssText='background:#0d1f0d;border:1px solid rgba(5,150,105,.2);border-radius:12px;padding:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;';
+          var info=document.createElement('div');
+          info.innerHTML='<div style="font-size:13px;font-weight:700;color:#e2eaf4;">'+u.name+'</div><div style="font-size:11px;color:#7a9bbf;">@'+u.username+'</div>';
+          var badge=document.createElement('span');badge.style.cssText='font-size:11px;color:#34d399;font-weight:700;';badge.textContent='✓ Aktif';
+          row.appendChild(info);row.appendChild(badge);content.appendChild(row);
+        });
+      }
+    })
+    .catch(function(){content.innerHTML='<div style="color:#ef4444;padding:20px;text-align:center;">Bağlantı hatası</div>';});
+}
+
+
+function approveUser(username,ov){
+  if(ov)ov.remove();
+  fetch(CLOUD_URL+'/zzp-users/'+username)
+  .then(function(r){return r.json();})
+  .then(function(data){
+    data.status='approved';data.adminKey='78159228Mo';
+    return fetch(CLOUD_URL+'/zzp-users/'+username,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  }).then(function(){openAdminPanel();}).catch(function(){openAdminPanel();});
+}
+
+function rejectUser(username,ov){
+  if(ov)ov.remove();
+  fetch(CLOUD_URL+'/zzp-users/'+username)
+  .then(function(r){return r.json();})
+  .then(function(data){
+    data.status='rejected';data.adminKey='78159228Mo';
+    return fetch(CLOUD_URL+'/zzp-users/'+username,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  }).then(function(){openAdminPanel();}).catch(function(){openAdminPanel();});
+}
+
+function renderSettings(){
+  var s=getSettings();
+  var adminBtn=CURRENT_USER==='mert'||CURRENT_USER==='admin'?'<button onclick="openAdminPanel()" style="width:100%;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#f59e0b;border-radius:12px;padding:12px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:16px;">👤 Admin Panel - Kullanıcıları Yönet</button>':'';
+  document.getElementById('content').innerHTML='<div class="page"><div class="page-title">Ayarlar</div>'+adminBtn+'<div class="settings-section"><div class="settings-title">Bedrijfsgegevens</div><label class="fl">Bedrijfsnaam</label><input id="s-name" value="'+s.name+'"/><label class="fl">Adres</label><input id="s-address" value="'+s.address+'"/><label class="fl">Stad / Postcode</label><input id="s-city" value="'+s.city+'"/><label class="fl">Telefoon</label><input id="s-phone" value="'+s.phone+'" inputmode="tel"/><label class="fl">E-mail</label><input id="s-email" value="'+s.email+'" inputmode="email"/><label class="fl">IBAN</label><input id="s-iban" value="'+s.iban+'"/><label class="fl">BTW Nummer</label><input id="s-btwNr" value="'+s.btwNr+'"/><label class="fl">KvK Nummer</label><input id="s-kvk" value="'+s.kvk+'"/><button class="btn-primary" onclick="saveSettings()" style="margin-top:16px">Kaydet</button></div></div>';
+}
+function saveSettings(){
+  var s={name:(document.getElementById('s-name')||{}).value||'',address:(document.getElementById('s-address')||{}).value||'',city:(document.getElementById('s-city')||{}).value||'',phone:(document.getElementById('s-phone')||{}).value||'',email:(document.getElementById('s-email')||{}).value||'',iban:(document.getElementById('s-iban')||{}).value||'',btwNr:(document.getElementById('s-btwNr')||{}).value||'',kvk:(document.getElementById('s-kvk')||{}).value||''};
+  DB.setObj('settings',s);
+  var btn=document.querySelector('#content .btn-primary');if(btn){var orig=btn.textContent;btn.textContent='Kaydedildi!';btn.style.background='var(--success)';setTimeout(function(){btn.textContent=orig;btn.style.background='';},2000);}
+}
 function renderCalendar(){
   var now=new Date();window._cy=now.getFullYear();window._cm=now.getMonth();
   var inv=DB.get('invoices'),expP=DB.get('exp_personal'),expB=DB.get('exp_business');
@@ -312,8 +590,7 @@ function calDay(ds){
   ev.forEach(function(e){var c=e.type==='inv'?'var(--success)':'var(--danger)';var lbl=e.type==='inv'?'Fatura':'Gider';rows+='<div class="row"><div class="row-main"><div class="row-name">'+e.label+'</div><div class="row-sub">'+lbl+'</div></div><div style="font-size:14px;font-weight:800;color:'+c+'">'+fmtEUR(e.amt)+'</div></div>';});
   openSheet('<div class="sheet-header"><div class="sheet-title">'+p[2]+'/'+p[1]+'/'+p[0]+'</div><button class="sheet-close" onclick="closeSheet()">Kapat</button></div><div class="card">'+rows+'</div>');
 }
-checkAutoBetaald();
-showTab('dashboard');
+// Login screen handles init
 </script>
 </body>
 </html>
