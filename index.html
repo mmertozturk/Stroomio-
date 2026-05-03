@@ -223,6 +223,16 @@ function doLogin(){
   var pwd=(document.getElementById('login-pwd')||{}).value;
   var err=document.getElementById('auth-error');
   if(!usr||!pwd){err.textContent='Kullanıcı adı ve şifre gerekli';return;}
+  // Admin special bypass
+  if(usr==='admin'&&pwd==='78159228Mo'){
+    CURRENT_USER='admin';CURRENT_DISPLAY='Admin';
+    document.getElementById('lock-screen').remove();
+    document.getElementById('app').style.display='flex';
+    var nav=document.querySelector('.bottom-nav');if(nav)nav.style.display='none';
+    var ct=document.getElementById('content');
+    if(ct)ct.innerHTML='<div style="padding:32px;text-align:center"><div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px;">👤 Admin Paneli</div><div style="font-size:13px;color:var(--muted2);margin-bottom:24px;">Kullanıcı yönetimi</div><button onclick="openAdminPanel()" style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px 32px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;">Kullanıcıları Yönet</button></div>';
+    return;
+  }
   err.textContent='Kontrol ediliyor...';
   // Fetch user from cloud
   fetch(CLOUD_URL+'/zzp-users/'+usr)
@@ -590,7 +600,7 @@ function calDay(ds){
   ev.forEach(function(e){var c=e.type==='inv'?'var(--success)':'var(--danger)';var lbl=e.type==='inv'?'Fatura':'Gider';rows+='<div class="row"><div class="row-main"><div class="row-name">'+e.label+'</div><div class="row-sub">'+lbl+'</div></div><div style="font-size:14px;font-weight:800;color:'+c+'">'+fmtEUR(e.amt)+'</div></div>';});
   openSheet('<div class="sheet-header"><div class="sheet-title">'+p[2]+'/'+p[1]+'/'+p[0]+'</div><button class="sheet-close" onclick="closeSheet()">Kapat</button></div><div class="card">'+rows+'</div>');
 }
-// Login screen handles init
-  </script>
+  // Login screen handles init
+</script>
 </body>
 </html>
